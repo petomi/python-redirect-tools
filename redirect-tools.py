@@ -109,10 +109,10 @@ def __test_redirects__():
             sheet.write(row_number, 2, status_code) #write response code
             sheet.write(row_number, 1, "") #write blank redirect url
         if(save_every_row):
-            write_copy.save(input_file + '.out' + os.path.splitext(input_file)[-1]) #saves excel doc after every row if enabled
+            write_copy.save(os.path.splitext(input_file)[0] + '-OUT' + os.path.splitext(input_file)[-1]) #saves excel doc after every row if enabled after every row if enabled
         row_number+=1 #increment row number so next loop cycle writes to next row in excel sheet
         print("===========")
-    write_copy.save(input_file + '.out' + os.path.splitext(input_file)[-1]) #save file after all changes are made
+    write_copy.save(os.path.splitest(input_file)[0] + '-OUT' + os.path.splitext(input_file)[-1]) #save file after all changes are made
     print("===================LIST COMPLETE=========================")
 
 def __create_redirect_map__():
