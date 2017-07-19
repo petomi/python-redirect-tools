@@ -47,8 +47,5 @@ Temporary Items
 .apdisk
 *.xls
 *.xlsx
-rewritemaps.config.txt
-*.txt
-*.txt
 *.config
 *.htaccess

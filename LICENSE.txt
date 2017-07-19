@@ -1,0 +1,2 @@
+Licensed under GPLv3.
+Created by Michael Peto, 2017.

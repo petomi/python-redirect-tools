@@ -118,7 +118,7 @@ def __test_redirects__():
 def __create_redirect_map__():
     print("=====REDIRECT MAP======")
     isRegexRule = False
-    output_file = "rewritemaps.config.txt"
+    output_file = "rewritemaps.config"
     format_syntax = ['<rewriteMaps>\r\n\t<rewriteMap name="Redirects">\r\n\t\t<add key="', '" value="', '" />\r\n\t</rewriteMap>\r\n</rewriteMaps>']
     __write_rules_to_file__(isRegexRule, output_file, format_syntax)
     print("===================REDIRECT MAP CREATED======================")
