@@ -41,8 +41,7 @@ def __sanitize_URLs__(rule, isMap, isHtaccess, isRegex):
     if(isRegex):
         current_redirect = current_redirect.replace(".", "\.").lstrip('\/').rstrip('\/').replace("/", "\/")
     elif(isMap):
-        current_redirect = re.sub(r'(\?).*', r'', current_redirect).rstrip('/') #strip ? from any tags (for use with IIS)
-        future_redirect = re.sub(r'(\?).*', r'', future_redirect).rstrip('/')
+        current_redirect = re.sub(r'(\?).*', r'', current_redirect).rstrip('/') #strip query from any incoming url
     elif(isHtaccess):
         current_redirect = current_redirect.replace("%23", "#")
         future_redirect = future_redirect.replace("%23", "#")
