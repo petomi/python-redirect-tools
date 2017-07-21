@@ -32,7 +32,7 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
-def __sanitize_URLs__(rule, isMap, isRegex):
+def __sanitize_URLs__(rule, isMap, isHtaccess, isRegex):
     current_redirect = strip_tags(str(rule[0]).lower().strip(" ><")).rstrip('/')
     future_redirect = strip_tags(str(rule[1]).lower().strip(" ><")).rstrip('/')
     domain_list = old_root_domains.values()
@@ -43,9 +43,12 @@ def __sanitize_URLs__(rule, isMap, isRegex):
     elif(isMap):
         current_redirect = re.sub(r'(\?).*', r'', current_redirect).rstrip('/') #strip ? from any tags (for use with IIS)
         future_redirect = re.sub(r'(\?).*', r'', future_redirect).rstrip('/')
+    elif(isHtaccess):
+        current_redirect = current_redirect.replace("%23", "#")
+        future_redirect = future_redirect.replace("%23", "#")
     return current_redirect, future_redirect
 
-def __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax):
+def __write_rules_to_file__(isRegexRule, isMap, isHtaccess, output_file, format_syntax):
     cols_to_parse=str(URL_column + ", " + redirect_column)
     rf = pandas.read_excel(input_file, index_col=None, parse_cols=cols_to_parse)
     list_of_redirects = list(rf.values)
@@ -54,11 +57,14 @@ def __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax):
     to_prepend = format_syntax[0]
     to_insert = format_syntax[1]
     to_append = format_syntax [2]
+    line_endings = "\r\n"
+    if(isHtaccess):
+        line_endings = "\n"
 
     if(isMap):
         file_to_write.write('<rewriteMaps>\r\n\t<rewriteMap name="Redirects">\r\n')
     for rule in list_of_redirects:
-        current_redirect, future_redirect = __sanitize_URLs__(rule, isMap, isRegexRule)
+        current_redirect, future_redirect = __sanitize_URLs__(rule, isMap, isHtaccess, isRegexRule)
         if(isRegexRule):
             to_insert = str('" stopProcessing="true">\r\n\t<match url="(' + current_redirect + ')(.*)" ignoreCase="true"/>\r\n\t<action type ="Redirect" url="' + new_root_domain)
             if(complex_regex):
@@ -67,7 +73,7 @@ def __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax):
                 to_append = str( '" redirectType = "Permanent" />\r\n</rule>')
         print (current_redirect + " = " + future_redirect)
         if(current_redirect not in previous_URLS):
-            file_to_write.write(str(to_prepend + current_redirect + to_insert + future_redirect + to_append + "\r\n"))
+            file_to_write.write(str(to_prepend + current_redirect + to_insert + future_redirect + to_append + line_endings))
         else:
             print("DUPLICATE ENTRY")
         previous_URLS.append(current_redirect)
@@ -127,27 +133,30 @@ def __create_redirect_map__():
     print("=====REDIRECT MAP======")
     isRegexRule = False
     isMap = True
+    isHtaccess = False
     output_file = "rewritemaps.config.txt"
     format_syntax = ['\t\t<add key="', '" value="', '" />\r\n']
-    __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax)
+    __write_rules_to_file__(isRegexRule, isMap, isHtaccess, output_file, format_syntax)
     print("===================REDIRECT MAP CREATED======================")
 
 def __create_htaccess__():
     print("=====HTACCESS CREATOR======")
     isRegexRule = False
     isMap = False
+    isHtaccess = True
     output_file = ".htaccess"
     format_syntax = ['Redirect 301 ', " ", ""]
-    __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax)
+    __write_rules_to_file__(isRegexRule, isMap, isHtaccess, output_file, format_syntax)
     print("===================HTACCESS CREATED======================")
 
 def __create_redirect_rules__():
     print("=====REDIRECT RULES======")
     isRegexRule = True
     isMap = False
+    isHtaccess = False
     output_file = "rewriterules.txt"
     format_syntax = [ '<rule name="', '', '']
-    __write_rules_to_file__(isRegexRule, isMap, output_file, format_syntax)
+    __write_rules_to_file__(isRegexRule, isMap, isHtaccess, output_file, format_syntax)
     print("===================REDIRECT RULES CREATED======================")
 
 def __help__():
