@@ -6,7 +6,7 @@ setup(
     packages=['redirect-tools'],
     scripts=['redirect-tools.py'],
     license='LICENSE.txt',
-    description='Tools for dealing with URL redirects.'
+    description='Tools for dealing with URL redirects.',
     long_description=open('README.txt').read(),
     install_requires=[
         'pandas>=0.20.1'
