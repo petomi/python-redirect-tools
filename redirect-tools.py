@@ -13,7 +13,7 @@ from xlwt import easyxf #https://pypi.python.org/pypi/xlwt/1.2.0
 config= configparser.ConfigParser()
 config.read('settings.cfg')
 
-input_file, URL_column, redirect_column, keep_original_comments, save_every_row, check_for_sharepoint_404, verify_SSL, new_root_domain, complex_regex, strip_query, old_root_domains = str(config['EXCEL FILE']['input_file']), str(config['EXCEL FILE']['URL_column']), str(config['EXCEL FILE']['redirect_column']), (config.getboolean('EXCEL FILE','keep_original_comments')), (config.getboolean('EXCEL FILE','save_every_row')), (config.getboolean('TESTING','check_for_sharepoint_404')), (config.getboolean('TESTING','verify_SSL')), str(config['RULE CREATION']['new_root_domain']), (config.getboolean('RULE CREATION','complex_regex')), (config.getboolean('RULE CREATION','strip_query')) dict(config.items('OLD ROOT DOMAINS'))
+input_file, URL_column, redirect_column, keep_original_comments, save_every_row, check_for_sharepoint_404, verify_SSL, new_root_domain, complex_regex, strip_query, old_root_domains = str(config['EXCEL FILE']['input_file']), str(config['EXCEL FILE']['URL_column']), str(config['EXCEL FILE']['redirect_column']), (config.getboolean('EXCEL FILE','keep_original_comments')), (config.getboolean('EXCEL FILE','save_every_row')), (config.getboolean('TESTING','check_for_sharepoint_404')), (config.getboolean('TESTING','verify_SSL')), str(config['RULE CREATION']['new_root_domain']), (config.getboolean('RULE CREATION','complex_regex')), (config.getboolean('RULE CREATION','strip_query')), dict(config.items('OLD ROOT DOMAINS'))
 
 def __sanitize_URLs__(rule, isMap, isHtaccess, isRegex):
 
