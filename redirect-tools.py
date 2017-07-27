@@ -2,7 +2,6 @@
 import sys
 import os
 import re
-from html.parser import HTMLParser #https://pypi.python.org/pypi/HTMLParser/0.0.2
 import pandas #https://pypi.python.org/pypi/pandas/0.20.1
 import requests #https://pypi.python.org/pypi/requests/2.14.2
 import configparser #https://pypi.python.org/pypi/configparser
@@ -16,32 +15,22 @@ config.read('settings.cfg')
 
 input_file, URL_column, redirect_column, keep_original_comments, save_every_row, check_for_sharepoint_404, verify_SSL, new_root_domain, complex_regex, old_root_domains = str(config['EXCEL FILE']['input_file']), str(config['EXCEL FILE']['URL_column']), str(config['EXCEL FILE']['redirect_column']), (config.getboolean('EXCEL FILE','keep_original_comments')), (config.getboolean('EXCEL FILE','save_every_row')), (config.getboolean('TESTING','check_for_sharepoint_404')), (config.getboolean('TESTING','verify_SSL')), str(config['RULE CREATION']['new_root_domain']), (config.getboolean('RULE CREATION','complex_regex')), dict(config.items('OLD ROOT DOMAINS'))
 
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
-
 def __sanitize_URLs__(rule, isMap, isHtaccess, isRegex):
-    current_redirect = strip_tags(str(rule[0]).lower().strip(" ><")).rstrip('/')
-    future_redirect = strip_tags(str(rule[1]).lower().strip(" ><")).rstrip('/')
+
+    current_redirect = str(rule[0]).lower().strip(" ><").rstrip('/')
+    future_redirect = str(rule[1]).lower().strip(" ><").rstrip('/')
+
     domain_list = old_root_domains.values()
     for domain in domain_list:
         current_redirect = current_redirect.replace(domain, "")
     if(isRegex):
         current_redirect = current_redirect.replace(".", "\.").lstrip('\/').rstrip('\/').replace("/", "\/")
     elif(isMap):
-        current_redirect = re.sub(r'(\?).*', r'', current_redirect).rstrip('/') #strip query from any incoming url
+        current_redirect = current_redirect.replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201c",'').replace(u"\u201d", '').replace('"', '').replace(u"\u0026", "&amp;")
+
+        #current_redirect = re.sub(r'(\?).*', r'', current_redirect).rstrip('/') #strip query from any incoming url
+
+        future_redirect = future_redirect.replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201c",'').replace(u"\u201d", '').replace('"', '').replace(u"\u0026", "&amp;")
     elif(isHtaccess):
         current_redirect = current_redirect.replace("%23", "#")
         future_redirect = future_redirect.replace("%23", "#")
@@ -133,7 +122,7 @@ def __create_redirect_map__():
     isRegexRule = False
     isMap = True
     isHtaccess = False
-    output_file = "rewritemaps.config.txt"
+    output_file = "rewritemaps.config"
     format_syntax = ['\t\t<add key="', '" value="', '" />\r\n']
     __write_rules_to_file__(isRegexRule, isMap, isHtaccess, output_file, format_syntax)
     print("===================REDIRECT MAP CREATED======================")
